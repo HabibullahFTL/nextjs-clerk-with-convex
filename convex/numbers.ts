@@ -20,13 +20,15 @@ export const getNumbers = query({
       limit: z.number().min(6),
     });
 
-    const zodValidationRes = await validationSchema.safeParseAsync(args);
+    const zodValidationRes = validationSchema.safeParse(args);
 
     if (!zodValidationRes.success) {
       return {
         success: false,
         error: zodValidationRes.error?.issues?.map((item) => ({
-          path: item?.path,
+          path: Array.isArray(item?.path)
+            ? item?.path?.[item?.path?.length - 1]
+            : item?.path,
           message: item?.message,
         })),
       };

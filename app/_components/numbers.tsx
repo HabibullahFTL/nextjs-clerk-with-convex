@@ -18,7 +18,7 @@ const Numbers = () => {
     return (
       <div className="p-4 rounded-md bg-red-50 text-red-700 border border-red-300">
         <p className="font-semibold">Error:</p>
-        <p className="text-sm">{result.error.toString()}</p>
+        <pre className="text-sm">{JSON.stringify(result.error, null, 2)}</pre>
       </div>
     );
   }
