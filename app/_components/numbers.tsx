@@ -4,11 +4,31 @@ import { api } from '@/convex/_generated/api';
 import { useQuery } from 'convex/react';
 
 const Numbers = () => {
-  const numbers = useQuery(api.numbers.getNumbers, { limit: 5 });
+  const result = useQuery(api.numbers.getNumbers, { limit: 5 });
+
+  if (result === undefined) {
+    return (
+      <div className="p-4 rounded-md bg-yellow-50 text-yellow-800 border border-yellow-300">
+        <p className="text-sm">Loading or unauthorized. Please sign in.</p>
+      </div>
+    );
+  }
+
+  if (result.error) {
+    return (
+      <div className="p-4 rounded-md bg-red-50 text-red-700 border border-red-300">
+        <p className="font-semibold">Error:</p>
+        <p className="text-sm">{result.error.toString()}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="">
-      <h2 className="text-2x font-medium text-red-500">Client Side</h2>
-      <pre>Numbers: {JSON.stringify(numbers, null, 2)}</pre>
+    <div className="p-4 rounded-md bg-gray-100 space-y-2">
+      <h2 className="text-xl font-semibold text-blue-600">Client Side</h2>
+      <pre className="text-sm bg-white p-2 rounded border">
+        {JSON.stringify(result, null, 2)}
+      </pre>
     </div>
   );
 };

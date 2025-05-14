@@ -1,18 +1,42 @@
 import { v } from 'convex/values';
+import { z } from 'zod';
 import { mutation, query } from './_generated/server';
 
+// convex/numbers.ts
 export const getNumbers = query({
   args: { limit: v.number() },
   handler: async (ctx, args) => {
     const auth = await ctx.auth.getUserIdentity();
+
     if (!auth?.email) {
-      throw new Error('You are not authenticated');
+      return {
+        error: 'You are not authenticated',
+        numbers: [],
+        user: null,
+      };
+    }
+
+    const validationSchema = z.object({
+      limit: z.number().min(6),
+    });
+
+    const zodValidationRes = await validationSchema.safeParseAsync(args);
+
+    if (!zodValidationRes.success) {
+      return {
+        success: false,
+        error: zodValidationRes.error?.issues?.map((item) => ({
+          path: item?.path,
+          message: item?.message,
+        })),
+      };
     }
 
     const numbers = await ctx.db
       .query('numbers')
       .order('desc')
-      .take(args.limit);
+      .take(zodValidationRes.data.limit);
+
     return {
       numbers: numbers?.map((item) => Math.round(item?.number)),
       user: { email: auth?.email },
