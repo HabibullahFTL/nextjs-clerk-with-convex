@@ -17,7 +17,7 @@ export const getNumbers = query({
     }
 
     const validationSchema = z.object({
-      limit: z.number().min(6),
+      limit: z.number().min(5),
     });
 
     const zodValidationRes = validationSchema.safeParse(args);
